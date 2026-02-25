@@ -1,20 +1,12 @@
-// ============================================
-// GLOBAL VARIABLE (Used for Edit Mode)
-// ============================================
 let editingProductId = null;
-
-
-// ============================================
-// GET PRODUCTS FROM LOCALSTORAGE
-// ============================================
 function getProducts() {
   return JSON.parse(localStorage.getItem("Products")) || [];
 }
 
 
-// ============================================
+// 
 // RENDERING PRODUCTS IN TABLE
-// ============================================
+// 
 function renderProducts() {
   const tableBody = document.querySelector("#table-data tbody");
   tableBody.innerHTML = "";
@@ -47,9 +39,9 @@ function renderProducts() {
 renderProducts();
 
 
-// ============================================
-// EDITING PRODUCT (OPEN MODAL WITH DATA)
-// ============================================
+// 
+// EDITING PRODUCT OPENING MODAL WITH DATA FILLED IN IT
+// 
 document
   .querySelector("#table-data tbody")
   .addEventListener("click", function (e) {
@@ -79,9 +71,9 @@ document
   });
 
 
-// ============================================
+// 
 // ADDING + UPDATING PRODUCT
-// ============================================
+// 
 document.querySelector("#saveProduct").addEventListener("click", function () {
 
   const name = document.querySelector("#product-name").value;
@@ -89,8 +81,22 @@ document.querySelector("#saveProduct").addEventListener("click", function () {
   const price = document.querySelector("#product-price").value;
   const description = document.querySelector("#product-description").value;
 
+  // console.log(typeof price)
+
+
   if (!name || !price || !description || !imageUrl) {
     alert("Please fill all fields");
+    return;
+  }
+  if (price <= 0) {
+    alert("Prize must be more than Zero")
+    return;
+  }
+
+  const pattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/[\w-./?%&=]*)?$/i;
+  const IsValidation = pattern.test(imageUrl)
+  if (!IsValidation) {
+    alert("Enter Valid URL")
     return;
   }
 
@@ -98,7 +104,7 @@ document.querySelector("#saveProduct").addEventListener("click", function () {
 
   if (editingProductId !== null) {
 
-    // ---------- CONFIRM BEFORE UPDATE ----------
+    // ---------- CONFIRMATION ----------
     const confirmUpdate = confirm("Are you sure you want to update this product?");
     if (!confirmUpdate) return;
 
@@ -116,7 +122,7 @@ document.querySelector("#saveProduct").addEventListener("click", function () {
 
   } else {
 
-    // ===== ADD MODE =====
+    // ===== ADD pRODUCT =====
     let newId;
 
     if (storedProducts.length > 0) {
@@ -135,6 +141,7 @@ document.querySelector("#saveProduct").addEventListener("click", function () {
     };
 
     storedProducts.push(newProduct);
+    document.getElementById("nodata").innerHTML = `<h2 style='color:red'> Product edited Successfully </h2>`;
   }
 
   localStorage.setItem("Products", JSON.stringify(storedProducts));
@@ -151,9 +158,9 @@ document.querySelector("#saveProduct").addEventListener("click", function () {
 });
 
 
-// ============================================
+// 
 // RESET MODAL WHEN CLOSED
-// ============================================
+// 
 const modalElement = document.getElementById("form-modal");
 
 modalElement.addEventListener("hidden.bs.modal", function () {
@@ -163,9 +170,9 @@ modalElement.addEventListener("hidden.bs.modal", function () {
 });
 
 
-// ============================================
+// 
 // DELETE PRODUCT
-// ============================================
+// 
 document
   .querySelector("#table-data tbody")
   .addEventListener("click", function (e) {
@@ -175,7 +182,7 @@ document
 
     const id = parseInt(deleteBtn.dataset.id);
 
-    // ---------- CONFIRM BEFORE DELETE ----------
+    // ---------- CONFIRMATION ----------
     const confirmDelete = confirm("Are you sure you want to delete this product?");
     if (!confirmDelete) return;
 
@@ -193,9 +200,9 @@ document
   });
 
 
-// ============================================
+// 
 // SEARCHING PRODUCTS
-// ============================================
+// 
 document.querySelector("#searchProduct")
   .addEventListener("input", function () {
 
@@ -224,9 +231,9 @@ document.querySelector("#searchProduct")
   });
 
 
-// ============================================
+// 
 // SORTING PRODUCTS
-// ============================================
+// 
 document.querySelector("#sortSelect")
   .addEventListener("change", function () {
 
@@ -257,19 +264,25 @@ document.querySelector("#sortSelect")
     }
 
     if (sortType === "price-asc") {
-      sortedProducts = products.toSorted(
-        (a, b) =>
-          parseFloat(a.price.replace("$", "")) -
-          parseFloat(b.price.replace("$", ""))
-      );
+      // sortedProducts = products.toSorted(
+      //   (a, b) =>
+      //     parseFloat(a.price.replace("$", "")) -
+      //     parseFloat(b.price.replace("$", ""))
+      // );
+
+      sortedProducts = products.toSorted((a, b) => a.price - b.price)
+
+
     }
 
     if (sortType === "price-desc") {
-      sortedProducts = products.toSorted(
-        (a, b) =>
-          parseFloat(b.price.replace("$", "")) -
-          parseFloat(a.price.replace("$", ""))
-      );
+      // sortedProducts = products.toSorted(
+      //   (a, b) =>
+      //     parseFloat(b.price.replace("$", "")) -
+      //     parseFloat(a.price.replace("$", ""))
+      // );
+      sortedProducts = products.toSorted((a, b) => b.price - a.price)
+
     }
 
     const tableBody = document.querySelector("#table-data tbody");
@@ -296,4 +309,4 @@ document.querySelector("#sortSelect")
 
       tableBody.appendChild(row);
     });
-});
+  });

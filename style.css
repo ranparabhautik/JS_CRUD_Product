@@ -1,45 +1,47 @@
 body {
     font-family: Arial, sans-serif;
-    background: #020024;
-    background: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(9, 9, 121, 1) 35%, rgba(0, 212, 255, 1) 100%);
-    background-repeat: no-repeat;
+    background: #f9fdf9; 
     margin: 0;
     padding: 20px;
-    width: 100%;
 }
 
 #table-data {
-    background: rgba(10, 15, 60, 0.95);
-    color: #ffffff;
+    background: rgba(245, 250, 245, 0.95); 
+    color: #2d2d2d; 
     border-radius: 10px;
     overflow: hidden;
     width: 100%;
-    box-shadow: 0 8px 25px rgba(0, 212, 255, 0.25);
+    box-shadow: 0 8px 25px rgba(100, 200, 200, 0.25);
 }
 
 #table-data thead {
-    background: linear-gradient(90deg, #091979, #00d4ff);
-    color: #ffffff;
+    background: linear-gradient(90deg, #fce38a, #81ecec, #74b9ff, #55efc4); 
+    color: #2d2d2d;
     font-weight: 600;
 }
 
 #table-data thead td {
-    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
 
 #table-data tbody tr {
-    background-color: #0a0f3d;
+    background-color: #f0f9f0; 
     transition: all 0.3s ease;
 }
 
 #table-data tbody tr:nth-child(even) {
-    background-color: #11186a;
+    background-color: #e0f7f2; 
 }
 
 #table-data tbody tr:hover {
-    background-color: rgba(0, 212, 255, 0.2);
+    background-color: rgba(130, 220, 210, 0.3); 
 }
 
 #table-data td {
-    border-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(130, 220, 210, 0.15); 
+}
+nav{
+    border-radius: 10px;
+    background-color: #74b9ff;
+    color: #2d2d2d;
 }
