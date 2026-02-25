@@ -1,0 +1,302 @@
+let editingProductId = null;
+// const defaultProducts = [
+//   {
+//     id: 1,
+//     name: "Laptop",
+//     description: "High performance laptop",
+//     price: "$1200",
+//     imageUrl: "https://via.placeholder.com/50"
+//   },
+//   {
+//     id: 2,
+//     name: "Phone",
+//     description: "Smartphone with great camera",
+//     price: "$800",
+//     imageUrl: "https://via.placeholder.com/50"
+//   }
+// ];
+
+// if (!localStorage.getItem("Products")) {
+//   localStorage.setItem("Products", JSON.stringify(defaultProducts));
+// }
+
+
+
+
+function getProducts() {
+  return JSON.parse(localStorage.getItem("Products")) || [];
+}
+
+
+
+
+
+
+
+function renderProducts() {
+  const tableBody = document.querySelector("#table-data tbody");
+  tableBody.innerHTML = "";
+
+  const storedProducts = JSON.parse(localStorage.getItem("Products")) || [];
+
+  storedProducts.forEach(function (product) {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${product.id}</td>
+      <td>${product.name}</td>
+      <td>${product.description}</td>
+      <td>${product.price}</td>
+      <td><img src="${product.imageUrl}" width="50"></td>
+      <td>
+        <button class="btn btn-light edit-btn" data-id="${product.id}">
+          <i class="bi bi-pencil-square"></i>
+        </button>
+        <button class="btn btn-light delete-btn" data-id="${product.id}">
+          <i class="bi bi-trash3"></i>
+        </button>
+      </td>
+    `;
+
+    tableBody.appendChild(row);
+  });
+}
+
+renderProducts();
+
+// EDIT BUTTON CLICK
+document
+  .querySelector("#table-data tbody")
+  .addEventListener("click", function (e) {
+    const editBtn = e.target.closest(".edit-btn");
+    if (!editBtn) return;
+
+    const id = parseInt(editBtn.dataset.id);
+    editingProductId = id;
+
+    const storedProducts = JSON.parse(localStorage.getItem("Products")) || [];
+
+    const product = storedProducts.find(function (p) {
+      return p.id === id;
+    });
+
+    if (!product) return;
+
+    document.querySelector("#product-name").value = product.name;
+    document.querySelector("#product-image-url").value = product.imageUrl;
+    document.querySelector("#product-price").value = product.price;
+    document.querySelector("#product-description").value = product.description;
+
+    document.querySelector("#addProductLabel").innerText = "Edit Product";
+
+    const modal = new bootstrap.Modal(document.getElementById("form-modal"));
+    modal.show();
+  });
+
+document.querySelector("#saveProduct").addEventListener("click", function () {
+  const name = document.querySelector("#product-name").value;
+  const imageUrl = document.querySelector("#product-image-url").value;
+  const price = document.querySelector("#product-price").value;
+  const description = document.querySelector("#product-description").value;
+
+  if (!name || !price || !description || !imageUrl) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  const storedProducts = JSON.parse(localStorage.getItem("Products")) || [];
+
+  if (editingProductId !== null) {
+    // ===== UPDATE MODE =====
+    const product = storedProducts.find(function (p) {
+      return p.id === editingProductId;
+    });
+
+    if (product) {
+      product.name = name;
+      product.imageUrl = imageUrl;
+      product.price = price;
+      product.description = description;
+    }
+  } else {
+    // ===== ADD MODE =====
+    let newId;
+
+    if (storedProducts.length > 0) {
+      const lastProduct = storedProducts[storedProducts.length - 1];
+      newId = lastProduct.id + 1;
+    } else {
+      newId = 1;
+    }
+
+    const newProduct = {
+      id: newId,
+      name: name,
+      imageUrl: imageUrl,
+      price: price,
+      description: description,
+    };
+
+    storedProducts.push(newProduct);
+  }
+
+  localStorage.setItem("Products", JSON.stringify(storedProducts));
+
+  renderProducts();
+
+  // Reset everything
+  editingProductId = null;
+  document.querySelector("form").reset();
+  document.querySelector("#exampleModalLabel").innerText = "Add Product";
+
+  const modal = bootstrap.Modal.getInstance(
+    document.getElementById("form-modal"),
+  );
+  modal.hide();
+});
+
+const modalElement = document.getElementById("form-modal");
+
+modalElement.addEventListener("hidden.bs.modal", function () {
+  // Reset edit mode
+  editingProductId = null;
+
+  // Reset form fields
+  document.querySelector("form").reset();
+
+  // Reset title
+  document.querySelector("#addProductLabel").innerText = "Add Product";
+});
+
+// DELETE BUTTON CLICK
+document
+  .querySelector("#table-data tbody")
+  .addEventListener("click", function (e) {
+    const deleteBtn = e.target.closest(".delete-btn");
+    if (!deleteBtn) return;
+    const id = parseInt(deleteBtn.dataset.id);
+
+    let storedProducts = JSON.parse(localStorage.getItem("Products")) || [];
+    for (let i = 0; i < storedProducts.length; i++) {
+      if (storedProducts[i].id === id) {
+        storedProducts.splice(i, 1);
+        break;
+      }
+    }
+
+    localStorage.setItem("Products", JSON.stringify(storedProducts));
+    renderProducts();
+  });
+
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") {
+    const modal = bootstrap.Modal.getInstance(
+      document.getElementById("form-modal"),
+    );
+    if (modal) modal.hide();
+  } else if (e.key === "Enter") {
+    document.querySelector("#saveProduct").click();
+        if (modal) modal.hide();
+
+  }
+});
+
+document.querySelector("#searchProduct").addEventListener("input", function () {
+  const searchText = this.value.toLowerCase().trim();
+  const rows = document.querySelectorAll("#table-data tbody tr");
+  let count = 0;
+  rows.forEach(function (row) {
+    const rowText = row.innerText.toLowerCase();
+    if (rowText.includes(searchText)) {
+      row.style.display = "";
+      count++;
+    } else {
+      row.style.display = "none";
+    }
+  });
+  if (count === 0) {
+    document.getElementById("nodata").innerHTML =
+      "<h3 style='color:red;'> No Data Found</h3>";
+  } else {
+    document.getElementById("nodata").innerHTML = "";
+  }
+});
+
+
+
+
+
+
+
+
+
+// Sorting of the products
+document.querySelector("#sortSelect").addEventListener("change", function () {
+  const sortType = this.value;
+  const products = getProducts();
+
+  if (!sortType) {
+    renderProducts();
+    return;
+  }
+
+  let sortedProducts;
+
+  if (sortType === "id-asc") {
+    sortedProducts = products.toSorted((a, b) => a.id - b.id);
+  }
+
+  if (sortType === "id-desc") {
+    sortedProducts = products.toSorted((a, b) => b.id - a.id);
+  }
+
+  if (sortType === "name-asc") {
+    sortedProducts = products.toSorted((a, b) => a.name.localeCompare(b.name));
+  }
+
+  if (sortType === "name-desc") {
+    sortedProducts = products.toSorted((a, b) => b.name.localeCompare(a.name));
+  }
+
+  if (sortType === "price-asc") {
+    sortedProducts = products.toSorted(
+      (a, b) =>
+        parseFloat(a.price.replace("$", "")) -
+        parseFloat(b.price.replace("$", "")),
+    );
+  }
+
+  if (sortType === "price-desc") {
+    sortedProducts = products.toSorted(
+      (a, b) =>
+        parseFloat(b.price.replace("$", "")) -
+        parseFloat(a.price.replace("$", "")),
+    );
+  }
+
+  // Manually render sorted array (no saving)
+  const tableBody = document.querySelector("#table-data tbody");
+  tableBody.innerHTML = "";
+
+  sortedProducts.forEach(function (product) {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+        <td>${product.id}</td>
+        <td>${product.name}</td>
+        <td>${product.description}</td>
+        <td>${product.price}</td>
+        <td><img src="${product.imageUrl}" width="50"></td>
+        <td>
+          <button class="btn btn-light edit-btn" data-id="${product.id}">
+            <i class="bi bi-pencil-square"></i>
+          </button>
+          <button class="btn btn-light delete-btn" data-id="${product.id}">
+            <i class="bi bi-trash3"></i>
+          </button>
+        </td>
+      `;
+
+    tableBody.appendChild(row);
+  });
+});
