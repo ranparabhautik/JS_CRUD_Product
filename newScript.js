@@ -74,6 +74,95 @@ document
 // 
 // ADDING + UPDATING PRODUCT
 // 
+
+
+
+
+// document.querySelector("#saveProduct").addEventListener("click", function () {
+
+//   const name = document.querySelector("#product-name").value;
+//   const imageUrl = document.querySelector("#product-image-url").value;
+//   const price = document.querySelector("#product-price").value;
+//   const description = document.querySelector("#product-description").value;
+
+//   // console.log(typeof price)
+
+
+//   if (!name || !price || !description || !imageUrl) {
+//     alert("Please fill all fields");
+//     return;
+//   }
+//   if (price <= 0) {
+//     alert("Prize must be more than Zero")
+//     return;
+//   }
+
+//   const pattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/[\w-./?%&=]*)?$/i;
+//   const IsValidation = pattern.test(imageUrl)
+//   if (!IsValidation) {
+//     alert("Enter Valid URL")
+//     return;
+//   }
+
+//   const storedProducts = JSON.parse(localStorage.getItem("Products")) || [];
+
+//   if (editingProductId !== null) {
+
+//     // ---------- CONFIRMATION ----------
+//     const confirmUpdate = confirm("Are you sure you want to update this product?");
+//     if (!confirmUpdate) return;
+
+//     // ===== UPDATE MODE =====
+//     const product = storedProducts.find(function (p) {
+//       return p.id === editingProductId;
+//     });
+
+//     if (product) {
+//       product.name = name;
+//       product.imageUrl = imageUrl;
+//       product.price = price;
+//       product.description = description;
+//     }
+
+//   } else {
+
+//     // ===== ADD pRODUCT =====
+//     let newId;
+
+//     if (storedProducts.length > 0) {
+//       const lastProduct = storedProducts[storedProducts.length - 1];
+//       newId = lastProduct.id + 1;
+//     } else {
+//       newId = 1;
+//     }
+
+//     const newProduct = {
+//       id: newId,
+//       name: name,
+//       imageUrl: imageUrl,
+//       price: price,
+//       description: description,
+//     };
+
+//     storedProducts.push(newProduct);
+//   }
+
+//   localStorage.setItem("Products", JSON.stringify(storedProducts));
+//   renderProducts();
+
+//   editingProductId = null;
+//   document.querySelector("form").reset();
+//   document.querySelector("#exampleModalLabel").innerText = "Add Product";
+
+//   const modal = bootstrap.Modal.getInstance(
+//     document.getElementById("form-modal")
+//   );
+//   modal.hide();
+// });
+
+
+
+
 document.querySelector("#saveProduct").addEventListener("click", function () {
 
   const name = document.querySelector("#product-name").value;
@@ -81,22 +170,26 @@ document.querySelector("#saveProduct").addEventListener("click", function () {
   const price = document.querySelector("#product-price").value;
   const description = document.querySelector("#product-description").value;
 
-  // console.log(typeof price)
-
-
   if (!name || !price || !description || !imageUrl) {
-    alert("Please fill all fields");
-    return;
-  }
-  if (price <= 0) {
-    alert("Prize must be more than Zero")
+    showAlert("Please fill all fields", "error");
     return;
   }
 
-  const pattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/[\w-./?%&=]*)?$/i;
-  const IsValidation = pattern.test(imageUrl)
-  if (!IsValidation) {
-    alert("Enter Valid URL")
+  if (price <= 0) {
+    alert("Price must be more than Zero");
+    return;
+  }
+
+  let isValid = true;
+
+  try {
+    new URL(imageUrl);
+  } catch (err) {
+    isValid = false;
+  }
+
+  if (!isValid) {
+    showAlert("Enter Valid URL");
     return;
   }
 
@@ -118,11 +211,13 @@ document.querySelector("#saveProduct").addEventListener("click", function () {
       product.imageUrl = imageUrl;
       product.price = price;
       product.description = description;
+
+      showAlert("Product updated successfully");
     }
 
   } else {
 
-    // ===== ADD pRODUCT =====
+    // ===== ADD PRODUCT =====
     let newId;
 
     if (storedProducts.length > 0) {
@@ -141,7 +236,8 @@ document.querySelector("#saveProduct").addEventListener("click", function () {
     };
 
     storedProducts.push(newProduct);
-    document.getElementById("nodata").innerHTML = `<h2 style='color:red'> Product edited Successfully </h2>`;
+
+    showAlert("Product added successfully");
   }
 
   localStorage.setItem("Products", JSON.stringify(storedProducts));
@@ -149,13 +245,20 @@ document.querySelector("#saveProduct").addEventListener("click", function () {
 
   editingProductId = null;
   document.querySelector("form").reset();
-  document.querySelector("#exampleModalLabel").innerText = "Add Product";
+  document.querySelector("#addProductLabel").innerText = "Add Product";
 
   const modal = bootstrap.Modal.getInstance(
     document.getElementById("form-modal")
   );
   modal.hide();
 });
+
+
+
+
+
+
+
 
 
 // 
@@ -197,6 +300,7 @@ document
 
     localStorage.setItem("Products", JSON.stringify(storedProducts));
     renderProducts();
+    showAlert("Product deleted successfully 🗑️","error");
   });
 
 
@@ -310,3 +414,27 @@ document.querySelector("#sortSelect")
       tableBody.appendChild(row);
     });
   });
+
+
+
+function showAlert(message, type = "success") {
+  const alertBox = document.getElementById("custom-alert");
+
+  alertBox.textContent = message;
+
+  // Change color depending on type
+  if (type === "success") {
+    alertBox.style.backgroundColor = "#28a745";
+  } else if (type === "error") {
+    alertBox.style.backgroundColor = "#dc3545";
+  } else if (type === "warning") {
+    alertBox.style.backgroundColor = "#ffc107";
+    alertBox.style.color = "#000";
+  }
+
+  alertBox.classList.add("show");
+
+  setTimeout(() => {
+    alertBox.classList.remove("show");
+  }, 2000);
+}
