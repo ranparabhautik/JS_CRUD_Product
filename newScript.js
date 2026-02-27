@@ -23,6 +23,9 @@ function renderProducts() {
       <td>${product.price}</td>
       <td><img src="${product.imageUrl}" width="50"></td>
       <td>
+      <button class="btn btn-light view-btn" data-id="${product.id}">
+            <i class="bi bi-eye"></i>
+          </button>
         <button class="btn btn-light edit-btn" data-id="${product.id}">
           <i class="bi bi-pencil-square"></i>
         </button>
@@ -300,7 +303,7 @@ document
 
     localStorage.setItem("Products", JSON.stringify(storedProducts));
     renderProducts();
-    showAlert("Product deleted successfully 🗑️","error");
+    showAlert("Product deleted successfully 🗑️", "error");
   });
 
 
@@ -402,6 +405,9 @@ document.querySelector("#sortSelect")
         <td>${product.price}</td>
         <td><img src="${product.imageUrl}" width="50"></td>
         <td>
+          <button class="btn btn-light view-btn" data-id="${product.id}">
+            <i class="bi bi-eye"></i>
+          </button>
           <button class="btn btn-light edit-btn" data-id="${product.id}">
             <i class="bi bi-pencil-square"></i>
           </button>
@@ -438,3 +444,16 @@ function showAlert(message, type = "success") {
     alertBox.classList.remove("show");
   }, 2000);
 }
+
+document
+  .querySelector("#table-data tbody")
+  .addEventListener("click", function (e) {
+
+    const viewBtn = e.target.closest(".view-btn");
+    if (!viewBtn) return;
+
+    const id = viewBtn.dataset.id;
+
+    // Redirect to view page
+    window.location.href = `view.html?id=${id}`;
+  });
